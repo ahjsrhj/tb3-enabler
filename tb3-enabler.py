@@ -25,7 +25,11 @@ md5_version = {
     "7fbc510cf91676739d638e1319d44e0e": ["10.12.3 (16D32)"],
     "33ff6f5326eba100d4e7c490f9bbf91e": ["10.12.4 (16E195)"],
     "58703942f8d4e5d499673c42cab0c923": ["10.12.5 (16F73)"],
-    "8ef3cf6dd8528976717e239aa8b20129": ["10.12.6 (16G29)"]
+    "8ef3cf6dd8528976717e239aa8b20129": ["10.12.6 (16G29)"],
+    "9d6788e5afe3369cac79546a66f34842": ["10.12.6 (16G1036)"],
+    "b58ba765f901b3b6f2fac39c2040e523": ["10.13.0 (17A365)"],
+    "bcb319c05541da0ccffd7a52da7236c5": ["10.13.1 (17B48)"],
+    "427b87e16e15c55c687a565fbd555e03": ["10.13.2"]
 }
 md5_patch = {
     "00e2f0eb5db157462a83e4de50583e33": "a6c2143c2f085c2c104369d7a1adfe03",
@@ -33,7 +37,11 @@ md5_patch = {
     "7fbc510cf91676739d638e1319d44e0e": "0af475c26cdf5e26f8fd7e4341dadea5",
     "33ff6f5326eba100d4e7c490f9bbf91e": "9237f013ab92f7eb5913bd142abf5fae",
     "58703942f8d4e5d499673c42cab0c923": "86c40c5b6cadcfe56f7a7a1e1d554dc9",
-    "8ef3cf6dd8528976717e239aa8b20129": "bc84c36d884178d6e743cd11a8a22e93"
+    "8ef3cf6dd8528976717e239aa8b20129": "bc84c36d884178d6e743cd11a8a22e93",
+    "9d6788e5afe3369cac79546a66f34842": "f1b280854306616dafb54b679c13e58e",
+    "b58ba765f901b3b6f2fac39c2040e523": "06a1a1fedc294b1bb78bc92625e412e1",
+    "bcb319c05541da0ccffd7a52da7236c5": "d0ae8daed7faccb8107f7b17772163b8",
+    "427b87e16e15c55c687a565fbd555e03": "d5c12e6f04d87d5b5a8ceef42cd36531"
 }
 md5_patch_r = dict((v, k) for k, v in md5_patch.items())
 
@@ -41,6 +49,10 @@ re_index = [
     {
         'search': "\x55\x48\x89\xE5\x41\x57\x41\x56\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01",
         'replace': "\x55\x48\x89\xE5\x31\xC0\x5D\xC3\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01"
+    },
+    {
+        'search': "\x55\x48\x89\xE5\x41\x57\x41\x56\x41\x55\x41\x54\x53\x48\x81\xEC\x28\x01",
+        'replace': "\x55\x48\x89\xE5\x31\xC0\x5D\xC3\x41\x55\x41\x54\x53\x48\x81\xEC\x28\x01"
     }
 ]
 re_md5 = {
@@ -50,8 +62,14 @@ re_md5 = {
         "7fbc510cf91676739d638e1319d44e0e",
         "33ff6f5326eba100d4e7c490f9bbf91e",
         "58703942f8d4e5d499673c42cab0c923",
-        "8ef3cf6dd8528976717e239aa8b20129"
+        "8ef3cf6dd8528976717e239aa8b20129",
+        "9d6788e5afe3369cac79546a66f34842"
         ],
+    1: [
+        "b58ba765f901b3b6f2fac39c2040e523",
+        "bcb319c05541da0ccffd7a52da7236c5",
+        "427b87e16e15c55c687a565fbd555e03"
+        ]
 }
 md5_re = dict((v, re_index[k]) for k, l in re_md5.items() for v in l)
 
@@ -59,7 +77,7 @@ md5_re = dict((v, re_index[k]) for k, l in re_md5.items() for v in l)
 def md5(filename):
     h = hashlib.md5()
     with open(filename, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), ''):
+        for chunk in iter(lambda: f.read(8192), b''):
             h.update(chunk)
     return h.hexdigest()
 
@@ -69,7 +87,7 @@ def backquote(command):
 
 def check_SIP():
     sip_info = backquote("nvram csr-active-config")
-    if sip_info.find("w%00%00%00") == -1:
+    if sip_info.find("%00%00%00") == -1:
         print("you must disable System Integrity Protection",file=sys.stderr)
         sys.exit(1)
 
@@ -129,7 +147,7 @@ def apply_patch():
     replace_re = md5_re[h]['replace']
     with open(target, 'rb') as f:
         source_data = f.read()
-    patched_data = re.sub(search_re, replace_re, source_data)
+    patched_data = source_data.replace(search_re, replace_re)
     with open(target, 'wb') as out:
         out.write(patched_data)
 
@@ -212,9 +230,28 @@ def do_force_apply():
     perform_backup()
     with open(target, 'rb') as f:
         source_data = f.read()
-    search_re = "\x55\x48\x89\xE5\x41\x57\x41\x56\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01"
-    replace_re = "\x55\x48\x89\xE5\x31\xC0\x5D\xC3\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01"
-    patched_data = re.sub(search_re, replace_re, source_data)
+
+    search_re1012 =  "\x55\x48\x89\xE5\x41\x57\x41\x56\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01"
+    replace_re1012 = "\x55\x48\x89\xE5\x31\xC0\x5D\xC3\x41\x55\x41\x54\x53\x48\x81\xEC\x38\x01"
+
+    search_re1013 =  "\x55\x48\x89\xE5\x41\x57\x41\x56\x41\x55\x41\x54\x53\x48\x81\xEC\x28\x01"
+    replace_re1013 = "\x55\x48\x89\xE5\x31\xC0\x5D\xC3\x41\x55\x41\x54\x53\x48\x81\xEC\x28\x01"
+
+    for replace in [replace_re1012, replace_re1013]:
+        if (source_data.find(replace) != -1):
+            print ("Looks like file is already patched, aborting")
+            sys.exit(1)
+
+    if (source_data.find(search_re1012) != -1):
+        patched_data = source_data.replace(search_re1012, replace_re1012)
+    else:
+        print ("Could not location to  patch for 10.12, trying for 10.13")
+        if (source_data.find(search_re1013) != -1):
+            patched_data = source_data.replace(search_re1013, replace_re1013)
+        else:
+            print ("10.13 also not found, exiting")
+            sys.exit(1)
+
     with open(target, 'wb') as out:
         out.write(patched_data)
     h = md5(target)
