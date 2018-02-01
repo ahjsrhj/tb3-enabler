@@ -27,9 +27,11 @@ md5_version = {
     "58703942f8d4e5d499673c42cab0c923": ["10.12.5 (16F73)"],
     "8ef3cf6dd8528976717e239aa8b20129": ["10.12.6 (16G29)"],
     "9d6788e5afe3369cac79546a66f34842": ["10.12.6 (16G1036)"],
+    "096de0ab3c312a2e432e056d398a096b": ["10.12.6 (16G1114)"],
     "b58ba765f901b3b6f2fac39c2040e523": ["10.13.0 (17A365)"],
     "bcb319c05541da0ccffd7a52da7236c5": ["10.13.1 (17B48)"],
-    "427b87e16e15c55c687a565fbd555e03": ["10.13.2 (17C88)"]
+    "427b87e16e15c55c687a565fbd555e03": ["10.13.2 (17C88)"],
+    "a47a724fdb13df4cef1b662b7ccbc9d1": ["10.13.3 (17D47)"]
 }
 md5_patch = {
     "00e2f0eb5db157462a83e4de50583e33": "a6c2143c2f085c2c104369d7a1adfe03",
@@ -39,9 +41,11 @@ md5_patch = {
     "58703942f8d4e5d499673c42cab0c923": "86c40c5b6cadcfe56f7a7a1e1d554dc9",
     "8ef3cf6dd8528976717e239aa8b20129": "bc84c36d884178d6e743cd11a8a22e93",
     "9d6788e5afe3369cac79546a66f34842": "f1b280854306616dafb54b679c13e58e",
+    "096de0ab3c312a2e432e056d398a096b": "52f6d17ef3fb3a0a899c0ea6a255afc9  ",
     "b58ba765f901b3b6f2fac39c2040e523": "06a1a1fedc294b1bb78bc92625e412e1",
     "bcb319c05541da0ccffd7a52da7236c5": "d0ae8daed7faccb8107f7b17772163b8",
-    "427b87e16e15c55c687a565fbd555e03": "d5c12e6f04d87d5b5a8ceef42cd36531"
+    "427b87e16e15c55c687a565fbd555e03": "d5c12e6f04d87d5b5a8ceef42cd36531",
+    "a47a724fdb13df4cef1b662b7ccbc9d1": "bcf9f00b8028bd305176816563ab2c00"
 }
 md5_patch_r = dict((v, k) for k, v in md5_patch.items())
 
@@ -63,12 +67,14 @@ re_md5 = {
         "33ff6f5326eba100d4e7c490f9bbf91e",
         "58703942f8d4e5d499673c42cab0c923",
         "8ef3cf6dd8528976717e239aa8b20129",
-        "9d6788e5afe3369cac79546a66f34842"
+        "9d6788e5afe3369cac79546a66f34842",
+        "096de0ab3c312a2e432e056d398a096b"
         ],
     1: [
         "b58ba765f901b3b6f2fac39c2040e523",
         "bcb319c05541da0ccffd7a52da7236c5",
-        "427b87e16e15c55c687a565fbd555e03"
+        "427b87e16e15c55c687a565fbd555e03",
+        "a47a724fdb13df4cef1b662b7ccbc9d1"
         ]
 }
 md5_re = dict((v, re_index[k]) for k, l in re_md5.items() for v in l)
